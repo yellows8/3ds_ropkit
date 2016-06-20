@@ -3,6 +3,14 @@ if [[ $? -ne 0 ]]; then
 	exit $?
 fi
 
+# Locate ROP_LDRR1R1_STRR1R0 here since it's not always available.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=aa6a623d7c3291340160fd74738249e68b3b4ac2b59cd2c9b5846adcfefb702f --patternsha256size=0xc "--plainout=#define ROP_LDRR1R1_STRR1R0 "`
+
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+fi
+
 # Locate the gadget for the conditional throw_fatalerror().
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=871fa0535022597b28d37811aa235ea59f56dd7b02d813c7a3dbc38306efc82b --patterndatamask=ffffffffffffffffffffffffffffffff000000ffffffffff --patternsha256size=0x18 "--plainout=#define ROP_COND_THROWFATALERR "`

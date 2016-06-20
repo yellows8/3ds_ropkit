@@ -89,6 +89,7 @@ else
 
 	if [[ $? -eq 0 ]]; then
 		python -c "print \"#define IFile_Close 0x%x\" % ($rawaddr+0x8 + (($tmpdata & 0xffffff)<<2))"
+		echo "#define ROP_EQBXLR_NE_CALLVTABLEFUNCPTR (IFile_Close+0x4)" # Offset 0x4 in IFile_Close for ROP conditional execution. For condition-code EQ, bx-lr is executed, otherwise a vtable funcptr call with the r0 object is executed. TODO: move this into the macros file later once that file is created?
 	else
 		echo "//WARNING: IFile_Close not found."
 	fi

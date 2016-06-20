@@ -23,6 +23,8 @@ else
 
 	if [[ $? -eq 0 ]]; then
 		echo "$printstr"
+	else
+		echo "//WARNING: ROP_CMPR0R1 not found."
 	fi
 fi
 
@@ -38,6 +40,23 @@ else
 
 	if [[ $? -eq 0 ]]; then
 		echo "$printstr"
+	else
+		echo "//WARNING: ROP_COND_THROWFATALERR* not found."
+	fi
+fi
+
+# Locate GXLOW_CMD4.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=406e130dfe0a99ba64c16ac6ec4a53355cb36f090647b73c5382ea180c88e72c --patternsha256size=0x30 "--plainout=#define GXLOW_CMD4 "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=92aaae0b22699ada29758d0f9c7043897b634196c87c0e6a3c9f562e221d751d --patternsha256size=0x3c "--plainout=#define GXLOW_CMD4 "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		echo "//WARNING: GXLOW_CMD4 not found."
 	fi
 fi
 

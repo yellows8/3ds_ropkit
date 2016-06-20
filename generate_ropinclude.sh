@@ -11,6 +11,21 @@ if [[ $? -eq 0 ]]; then
 	echo "$printstr"
 fi
 
+# Locate the gadget for ROP_CMPR0R1.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=947b973f3ad1e3073fa0aaf9e05314cb7f95cb0bbdde1d0f2b65e75c854be08e --patterndatamask=ffffffff00ffffff00ffffffffffffff --patternsha256size=0x10 "--plainout=#define ROP_CMPR0R1 "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	# This one executes "cmp r0, r1", updates r0 depending on the result, then executes bx-lr.
+
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=97b394def410a11df8cc645a58ed647c43aeb17fd0491b3ba336f059be39e74f --patternsha256size=0x14 "--plainout=#define ROP_CMPR0R1_ALT0 "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	fi
+fi
+
 # Locate the gadget for the conditional throw_fatalerror().
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=871fa0535022597b28d37811aa235ea59f56dd7b02d813c7a3dbc38306efc82b --patterndatamask=ffffffffffffffffffffffffffffffff000000ffffffffff --patternsha256size=0x18 "--plainout=#define ROP_COND_THROWFATALERR "`

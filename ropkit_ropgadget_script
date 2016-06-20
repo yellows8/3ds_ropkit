@@ -1,5 +1,4 @@
 --patterndata=842555e8c82550c2c431530590fe143174ca0d28d1e35a941b87cdee5e5fd465 --patternsha256size=0x4 "--plainout=#define ROP_POPPC "
---patterndata=e0160ca8a7f0ec85bd4b01d8756fb82e38344124545f0a7d58ae2ac288da17cc --patternsha256size=0x4 "--plainout=#define POP_R0PC "
 --patterndata=1db27e1b47976b065367f34eee05cdc06421c0053cadb2dfdd81ec315a47daff --patternsha256size=0x4 "--plainout=#define POP_R1PC "
 --patterndata=34c90c0722eaee19ec9a8c7dcb85f708066837c7e65d9e127f6052dc730f3465 --patternsha256size=0x4 "--plainout=#define POP_R3PC "
 --patterndata=eb5a703675a5f407a7bd08d37cab748ca9918984a944d2541064675b3f124f4d --patternsha256size=0x4 "--plainout=#define POP_R2R6PC "

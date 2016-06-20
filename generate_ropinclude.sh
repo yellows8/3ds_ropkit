@@ -3,6 +3,23 @@ if [[ $? -ne 0 ]]; then
 	exit $?
 fi
 
+# Locate the gadget for setting r0.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=e0160ca8a7f0ec85bd4b01d8756fb82e38344124545f0a7d58ae2ac288da17cc --patternsha256size=0x4 "--plainout=#define POP_R0PC "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	# This one does: r0 = *(sp+0), then pops r3 and pc from stack.
+
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=4ab819e1f53dd13355b6fc83fff9ff36e82e3866bb6da0f546221a457ba1a54d --patternsha256size=0x8 "--plainout=#define ROP_LDRR0SP_POPR3PC "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		echo "//WARNING: POP_R0PC/ROP_LDRR0SP_POPR3PC not found."
+	fi
+fi
+
 # Locate ROP_LDRR1R1_STRR1R0 here since it's not always available.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=aa6a623d7c3291340160fd74738249e68b3b4ac2b59cd2c9b5846adcfefb702f --patternsha256size=0xc "--plainout=#define ROP_LDRR1R1_STRR1R0 "`

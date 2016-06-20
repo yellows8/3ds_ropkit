@@ -24,7 +24,15 @@ else
 	if [[ $? -eq 0 ]]; then
 		echo "$printstr"
 	else
-		echo "//WARNING: ROP_CMPR0R1 not found."
+		# The same name is used here since this would be used the same way in the ROP-chain, even though the functionality is different.
+
+		printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=6fada5834ebff9c9baf94ad60e873cf97613a5b2f8748ed39f0faa14758396be --patternsha256size=0x18 "--plainout=#define ROP_CMPR0R1_ALT0 "`
+
+		if [[ $? -eq 0 ]]; then
+			echo "$printstr"
+		else
+			echo "//WARNING: ROP_CMPR0R1* not found."
+		fi
 	fi
 fi
 
@@ -89,9 +97,10 @@ else
 
 	if [[ $? -eq 0 ]]; then
 		python -c "print \"#define IFile_Close 0x%x\" % ($rawaddr+0x8 + (($tmpdata & 0xffffff)<<2))"
-		echo "#define ROP_EQBXLR_NE_CALLVTABLEFUNCPTR (IFile_Close+0x4)" # Offset 0x4 in IFile_Close for ROP conditional execution. For condition-code EQ, bx-lr is executed, otherwise a vtable funcptr call with the r0 object is executed. TODO: move this into the macros file later once that file is created?
 	else
 		echo "//WARNING: IFile_Close not found."
 	fi
 fi
+
+echo "#define ROP_EQBXLR_NE_CALLVTABLEFUNCPTR (IFile_Close+0x4)" # Offset 0x4 in IFile_Close for ROP conditional execution. For condition-code EQ, bx-lr is executed, otherwise a vtable funcptr call with the r0 object is executed. TODO: move this into the macros file later once that file is created?
 

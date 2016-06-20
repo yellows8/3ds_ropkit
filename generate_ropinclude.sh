@@ -60,3 +60,18 @@ else
 	fi
 fi
 
+# Locate IFile_Open.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=f12b196453c8d76905a0abe3a5395295471ba44f4b1ac6d3fe7f585b59c217ec --patternsha256size=0x18 "--plainout=#define IFile_Open "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=5e4960e460a86bd40ddf00ea5981da01c4ec6246a40d28138976629c4e298fe5 --patternsha256size=0x18 "--plainout=#define IFile_Open "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		echo "//WARNING: IFile_Open not found."
+	fi
+fi
+

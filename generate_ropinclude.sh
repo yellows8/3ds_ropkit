@@ -75,3 +75,22 @@ else
 	fi
 fi
 
+# Locate IFile_Close.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=d2dfec7874a22d753a2715e6ad640e0572d6b3d86d12792762d259ff0216705e --patternsha256size=0x18 "--plainout=#define IFile_Close "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	#If locating the function via the actual function code fails(newer version of that code), try locating it via code calling it instead.
+
+	cmdstr="ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=ca3add997a4d158ec6815506271f20d23d2c1d3a0c33dc85f8ed65e3cfc8d260  --patterndatamask=00fff0ffffffffff000000ff --patternsha256size=0xc --plainout="
+	rawaddr=`$cmdstr --addval=0x8`
+	tmpdata=`$cmdstr --dataload=0x8`
+
+	if [[ $? -eq 0 ]]; then
+		python -c "print \"#define IFile_Close 0x%x\" % ($rawaddr+0x8 + (($tmpdata & 0xffffff)<<2))"
+	else
+		echo "//WARNING: IFile_Close not found."
+	fi
+fi
+

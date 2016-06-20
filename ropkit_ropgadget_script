@@ -34,6 +34,6 @@
 #--patterndata=e25b7bfb96863f69fcbef8fdad176da9dff3e72502c1f2ca837115b3fc290212 --patternsha256size=0x10 "--plainout=#define FS_MountSdmc "
 
 --patterndata=d2dfec7874a22d753a2715e6ad640e0572d6b3d86d12792762d259ff0216705e --patternsha256size=0x18 "--plainout=#define IFile_Close "
---patterndata=7c1b921157c09b6c974ed6c215e00d4ade20467835b0db46a38a138f03bbcaf5 --patternsha256size=0x20 "--plainout=#define IFile_Read "
+--patterndata=2827533a920a7c93af6ad1abc5b1507615c37c44bcfb7ce2becf1829cf212f93 --patternsha256size=0x14 "--plainout=#define IFile_Read "
 --patterndata=239d3eb9de25fc1e5518d611b00a660ca5348b077f5cacd3d600039529f26202 --patterndatamask=ffffffffffffffffff0fffffff0fffffff0fffffff0fffffff0fffff --patternsha256size=0x1c "--plainout=#define IFile_Write "
 

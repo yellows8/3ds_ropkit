@@ -18,7 +18,7 @@
 --patterndata=52e0aa6d5ac4cda766a2b4d0d0702c2d756d4df5d4a57c43d35d64cce3f85881 --patternsha256size=0x10 "--plainout=#define ROP_LDRR1_FROMR5ARRAY_R4WORDINDEX "
 --patterndata=e7fceffb115a26437422742f17ddf516a90e010d0a280a32129ae5fc0e60a4a4 --patternsha256size=0x10 "--plainout=#define ROP_CMPR0R1 "
 
---patterndata=ea2d9f91d1fdb4bc29803e1f24dafd5b2f3aa3455579e356448933f149132243 --patternsha256size=0x18 "--plainout=#define ROP_INITOBJARRAY " --addval=0x1
+#--patterndata=ea2d9f91d1fdb4bc29803e1f24dafd5b2f3aa3455579e356448933f149132243 --patternsha256size=0x18 "--plainout=#define ROP_INITOBJARRAY " --addval=0x1
 
 --patterndata=3dd9c6c8a88e2ee07f9d0debcb5ef3b5ff142f0b3c6548616418bb749bb4d860 --patternsha256size=0x1c "--plainout=#define MEMCPY "
 --patterndata=730f1de429d80d0f5e921d483b8078909870c94538bd3b400f1823010ab4c53e --patternsha256size=0x28 "--plainout=#define MEMSET32_OTHER "
@@ -27,17 +27,17 @@
 --patterndata=0103df5f7916ca91a0c1698573ae7878a488c5df5f01e717f336dca82262b6a9 --patternsha256size=0x24 "--plainout=#define svcCreateThread "
 --patterndata=a424f8b938aa4919842c18cf173c854c6412bacc5bf48ff0abbb7164e69ec507 --patternsha256size=0x8 "--plainout=#define svcSleepThread "
 
---patterndata=366bba65c8afca3ec78dd6272bb147fa894866e38bc85642c68fa491c3f7905f --patternsha256size=0x18 "--plainout=#define SRV_GETSERVICEHANDLE "
+#--patterndata=366bba65c8afca3ec78dd6272bb147fa894866e38bc85642c68fa491c3f7905f --patternsha256size=0x18 "--plainout=#define SRV_GETSERVICEHANDLE "
 
 --patterndata=406e130dfe0a99ba64c16ac6ec4a53355cb36f090647b73c5382ea180c88e72c --patternsha256size=0x30 "--plainout=#define GXLOW_CMD4 "
 
---patterndata=18f4341ba0caf2c160825b63587aeff7d4e0edec4d4107fecc06127b4cb9726b --patternsha256size=0x2c "--plainout=#define CFGIPC_SecureInfoGetRegion "
+#--patterndata=18f4341ba0caf2c160825b63587aeff7d4e0edec4d4107fecc06127b4cb9726b --patternsha256size=0x2c "--plainout=#define CFGIPC_SecureInfoGetRegion "
 
 --patterndata=13e4f43b6452910ff7a0dc1804e38c4e5dba166750871a37c7beefd22995a484 --patternsha256size=0x18 "--plainout=#define GSPGPU_FlushDataCache "
 --patterndata=56d7a4a092f431aca4c7091f82482481324df2fd1e27fd86a6d7cd4904ca9af2 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffff --patternsha256size=0x24 --dataload=0x28 "--plainout=#define GSPGPU_SERVHANDLEADR "
---patterndata=39b7de81819a6efcff6a796bf180f0b76672485a7aebe40113580d73df1d2f44 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x94 "--plainout=#define GSP_SHAREDMEM_SETUPFRAMEBUF "
+#--patterndata=39b7de81819a6efcff6a796bf180f0b76672485a7aebe40113580d73df1d2f44 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x94 "--plainout=#define GSP_SHAREDMEM_SETUPFRAMEBUF "
 
---patterndata=e25b7bfb96863f69fcbef8fdad176da9dff3e72502c1f2ca837115b3fc290212 --patternsha256size=0x10 "--plainout=#define FS_MountSdmc "
+#--patterndata=e25b7bfb96863f69fcbef8fdad176da9dff3e72502c1f2ca837115b3fc290212 --patternsha256size=0x10 "--plainout=#define FS_MountSdmc "
 
 --patterndata=f12b196453c8d76905a0abe3a5395295471ba44f4b1ac6d3fe7f585b59c217ec --patternsha256size=0x18 "--plainout=#define IFile_Open "
 --patterndata=d2dfec7874a22d753a2715e6ad640e0572d6b3d86d12792762d259ff0216705e --patternsha256size=0x18 "--plainout=#define IFile_Close "

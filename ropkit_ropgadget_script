@@ -13,7 +13,6 @@
 --patterndata=17f19cd8b8896468edbad52b1a47862f432c6f7b119e7f5b2f4458d3a9009795 --patternsha256size=0x8 "--plainout=#define ROP_STR_R0TOR1 "
 --patterndata=b77067177e2cd4f7aab57202cca9d6a8fff0ef2551d1d0367b58c2cafdf2d8d0 --patternsha256size=0x8 "--plainout=#define ROP_LDR_R0FROMR0 "
 --patterndata=b07e2e2704ce8c323d159ab2283960209789fd5aa19952e762d59f4c2a38dad3 --patternsha256size=0x8 "--plainout=#define ROP_ADDR0_TO_R1 "
---patterndata=52e0aa6d5ac4cda766a2b4d0d0702c2d756d4df5d4a57c43d35d64cce3f85881 --patternsha256size=0x10 "--plainout=#define ROP_LDRR1_FROMR5ARRAY_R4WORDINDEX "
 
 #--patterndata=ea2d9f91d1fdb4bc29803e1f24dafd5b2f3aa3455579e356448933f149132243 --patternsha256size=0x18 "--plainout=#define ROP_INITOBJARRAY " --addval=0x1
 

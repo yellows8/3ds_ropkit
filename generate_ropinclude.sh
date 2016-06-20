@@ -48,7 +48,15 @@ else
 		if [[ $? -eq 0 ]]; then
 			echo "$printstr"
 		else
-			echo "//WARNING: ROP_CMPR0R1* not found."
+			# The comment for the above pattern applies for this one too.
+
+			printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=1fe92f9bb37de52b947db019749a9e7693b246f71a0be7de624d633f80c95184 --patternsha256size=0x18 "--plainout=#define ROP_CMPR0R1_ALT0 "`
+
+			if [[ $? -eq 0 ]]; then
+				echo "$printstr"
+			else
+				echo "//WARNING: ROP_CMPR0R1* not found."
+			fi
 		fi
 	fi
 fi

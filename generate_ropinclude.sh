@@ -61,6 +61,23 @@ else
 	fi
 fi
 
+# Locate ROP_INITOBJARRAY.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=ea2d9f91d1fdb4bc29803e1f24dafd5b2f3aa3455579e356448933f149132243 --patternsha256size=0x18 "--plainout=#define ROP_INITOBJARRAY " --addval=0x1`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	# Older version of the above, in ARM-mode.
+
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=e3691cfe859e38d854b7e31a7413a8a6098f4f9ddcff61db996fb8e538fef169 --patternsha256size=0x40 "--plainout=#define ROP_INITOBJARRAY "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		echo "//WARNING: ROP_INITOBJARRAY not found."
+	fi
+fi
+
 # Locate the gadget for the conditional throw_fatalerror().
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=871fa0535022597b28d37811aa235ea59f56dd7b02d813c7a3dbc38306efc82b --patterndatamask=ffffffffffffffffffffffffffffffff000000ffffffffff --patternsha256size=0x18 "--plainout=#define ROP_COND_THROWFATALERR "`

@@ -20,8 +20,6 @@
 --patterndata=0103df5f7916ca91a0c1698573ae7878a488c5df5f01e717f336dca82262b6a9 --patternsha256size=0x24 "--plainout=#define svcCreateThread "
 --patterndata=a424f8b938aa4919842c18cf173c854c6412bacc5bf48ff0abbb7164e69ec507 --patternsha256size=0x8 "--plainout=#define svcSleepThread "
 
-#--patterndata=366bba65c8afca3ec78dd6272bb147fa894866e38bc85642c68fa491c3f7905f --patternsha256size=0x18 "--plainout=#define SRV_GETSERVICEHANDLE "
-
 #--patterndata=18f4341ba0caf2c160825b63587aeff7d4e0edec4d4107fecc06127b4cb9726b --patternsha256size=0x2c "--plainout=#define CFGIPC_SecureInfoGetRegion "
 
 --patterndata=13e4f43b6452910ff7a0dc1804e38c4e5dba166750871a37c7beefd22995a484 --patternsha256size=0x18 "--plainout=#define GSPGPU_FlushDataCache "

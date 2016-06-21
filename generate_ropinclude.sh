@@ -78,6 +78,23 @@ else
 	fi
 fi
 
+# Locate SRV_GETSERVICEHANDLE.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=883dc75d232f768ecafc1d6fd569c3b8301b1eda5ef5d52392872eed9be7f015  --patterndatamask=ffffffff00ffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x18 "--plainout=#define SRV_GETSERVICEHANDLE "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	# Older version of the above.
+
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=8c3af44c29096e3e1d07f7435027cc22fda8437264e9542ac47280b1a01c1010 --patternsha256size=0x20 "--plainout=#define SRV_GETSERVICEHANDLE "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		echo "//WARNING: SRV_GETSERVICEHANDLE not found."
+	fi
+fi
+
 # Locate the gadget for the conditional throw_fatalerror().
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=871fa0535022597b28d37811aa235ea59f56dd7b02d813c7a3dbc38306efc82b --patterndatamask=ffffffffffffffffffffffffffffffff000000ffffffffff --patternsha256size=0x18 "--plainout=#define ROP_COND_THROWFATALERR "`

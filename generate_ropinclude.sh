@@ -144,6 +144,32 @@ else
 	fi
 fi
 
+# Locate GSP_SHAREDMEM_SETUPFRAMEBUF.
+
+# Newest version.
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=39b7de81819a6efcff6a796bf180f0b76672485a7aebe40113580d73df1d2f44 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x94 "--plainout=#define GSP_SHAREDMEM_SETUPFRAMEBUF "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	# From system-version v3.0.
+
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=a78a6ea171b8ecbcf648eb77ee932b14851a1f302b02e7aaa8a4a5e4d8df0ca6 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x98 "--plainout=#define GSP_SHAREDMEM_SETUPFRAMEBUF "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		# From system-version v1.0.
+
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=03264e88cf05c243ecd176841c11769b60b14f1bac95f7422abe82ab2d322fd2 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0xc4 "--plainout=#define GSP_SHAREDMEM_SETUPFRAMEBUF "`
+
+		if [[ $? -eq 0 ]]; then
+			echo "$printstr"
+		else
+			echo "//WARNING: GSP_SHAREDMEM_SETUPFRAMEBUF not found."
+		fi
+	fi
+fi
+
 # Locate FS_MountSdmc.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=e25b7bfb96863f69fcbef8fdad176da9dff3e72502c1f2ca837115b3fc290212 --patternsha256size=0x10 "--plainout=#define FS_MountSdmc "`

@@ -110,6 +110,15 @@ else
 	fi
 fi
 
+# Locate FS_MountSdmc.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=e25b7bfb96863f69fcbef8fdad176da9dff3e72502c1f2ca837115b3fc290212 --patternsha256size=0x10 "--plainout=#define FS_MountSdmc "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	echo "//WARNING: FS_MountSdmc not found."
+fi
+
 # Locate IFile_Open.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=f12b196453c8d76905a0abe3a5395295471ba44f4b1ac6d3fe7f585b59c217ec --patternsha256size=0x18 "--plainout=#define IFile_Open "`

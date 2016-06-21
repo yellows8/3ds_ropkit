@@ -95,6 +95,23 @@ else
 	fi
 fi
 
+# Locate CFGIPC_SecureInfoGetRegion.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=18f4341ba0caf2c160825b63587aeff7d4e0edec4d4107fecc06127b4cb9726b --patternsha256size=0x2c "--plainout=#define CFGIPC_SecureInfoGetRegion "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	# Older version of the above.
+
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=6132230265fd553f4ba25fbbb857f0119204c147a7f88d5d08f7e4a1bf60d335 --patternsha256size=0x3c "--plainout=#define CFGIPC_SecureInfoGetRegion "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		echo "//WARNING: CFGIPC_SecureInfoGetRegion not found."
+	fi
+fi
+
 # Locate the gadget for the conditional throw_fatalerror().
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=871fa0535022597b28d37811aa235ea59f56dd7b02d813c7a3dbc38306efc82b --patterndatamask=ffffffffffffffffffffffffffffffff000000ffffffffff --patternsha256size=0x18 "--plainout=#define ROP_COND_THROWFATALERR "`

@@ -74,7 +74,15 @@ else
 	if [[ $? -eq 0 ]]; then
 		echo "$printstr"
 	else
-		echo "//WARNING: ROP_INITOBJARRAY not found."
+		# Another version of the above.
+
+		printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=290002253638463182bd3ec5fe8636aa6c7726aa0eacf9009e2a14bf7ba6639e --patternsha256size=0x40 "--plainout=#define ROP_INITOBJARRAY "`
+
+		if [[ $? -eq 0 ]]; then
+			echo "$printstr"
+		else
+			echo "//WARNING: ROP_INITOBJARRAY not found."
+		fi
 	fi
 fi
 

@@ -248,7 +248,13 @@ ROP_LOADR0_FROMADDR \cmpaddr
 
 ROP_SETR1 \cmpword
 
+#ifdef ROP_CMPR0R1
 .word ROP_CMPR0R1
+#elif defined (ROP_CMPR0R1_ALT0)
+.word ROP_CMPR0R1_ALT0
+#else
+#error "ROP_CMPR0R1* isn't defined."
+#endif
 
 ROPMACRO_STACKPIVOT_PREPARE \stackaddr_cmpmismatch, ROP_POPPC
 

@@ -1,4 +1,4 @@
-ropgadget_patternfinder $1 --script=ropkit_ropgadget_script --baseaddr=0x100000 --patterntype=sha256 --disablelocatehalt
+ropgadget_patternfinder $1 --script=$2/ropkit_ropgadget_script --baseaddr=0x100000 --patterntype=sha256 --disablelocatehalt
 if [[ $? -ne 0 ]]; then
 	exit $?
 fi
@@ -220,6 +220,4 @@ else
 		echo "//WARNING: IFile_Close not found."
 	fi
 fi
-
-echo "#define ROP_EQBXLR_NE_CALLVTABLEFUNCPTR (IFile_Close+0x4)" # Offset 0x4 in IFile_Close for ROP conditional execution. For condition-code EQ, bx-lr is executed, otherwise a vtable funcptr call with the r0 object is executed. TODO: move this into the macros file later once that file is created?
 

@@ -111,7 +111,7 @@ ROP_SETR1 \r1
 .macro CALLFUNC_LDRR1 funcadr, r0, r1, r2, r3, sp0, sp4, sp8, sp12
 ROP_SETLR ROP_POPPC
 
-ROPMACRO_COPYWORD (ROPBUF + ((. + 0x40 + 0x14 + 0x8 + 0x4) - _start)), \r1
+ROPMACRO_COPYWORD (ROPBUF + ((. + 0x8 + 0x14 + 0x8 + 0x4) - _start)), \r1
 
 ROP_SETLR POP_R2R6PC
 
@@ -172,7 +172,7 @@ ROP_SETR1 \r1
 .macro CALLFUNC_NOSP_LOADR2 funcadr, r0, r1, r2, r3
 ROP_SETLR ROP_POPPC
 
-ROPMACRO_COPYWORD (ROPBUF + ((. + 0x40 + 0x8 + 0x8 + 0x4) - _start)), \r2
+ROPMACRO_COPYWORD (ROPBUF + ((. + 0x8 + 0x8 + 0x8 + 0x4) - _start)), \r2
 
 ROP_SETR0 \r0
 
@@ -210,6 +210,11 @@ CALLFUNC GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
 @ This is basically: CALL_GXCMD4 *srcadr, dstadr, cpysize
 .macro CALL_GXCMD4_LDRSRC srcadr, dstadr, cpysize
 CALLFUNC_LOADR0 GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
+.endm
+
+@ This is basically: CALL_GXCMD4 srcadr, *dstadr, cpysize
+.macro CALL_GXCMD4_LDRDST srcadr, dstadr, cpysize
+CALLFUNC_LDRR1 GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
 .endm
 
 .macro ROPMACRO_STACKPIVOT_PREPARE sp, pc
@@ -276,6 +281,17 @@ ROP_SETR1 \dstaddr
 .word ROP_STR_R0TOR1
 .endm
 
+.macro ROPMACRO_COPYWORD_FROMR0 dstaddr
+ROP_SETLR ROP_POPPC
+
+.word ROP_LDR_R0FROMR0
+
+ROP_SETR1 \dstaddr
+
+.word ROP_STR_R0TOR1
+.endm
+
+#define ROPMACRO_LDDRR0_ADDR1_STRADDR_VALUEOFFSET 0x24 //Offset relative to the start of ROPMACRO_LDDRR0_ADDR1_STRADDR where the add-value is located.
 .macro ROPMACRO_LDDRR0_ADDR1_STRADDR dstaddr, srcaddr, value
 ROP_LOADR0_FROMADDR \srcaddr
 

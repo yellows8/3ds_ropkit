@@ -8,12 +8,26 @@
 
 #define ropkit_IFile_ctx (ROPKIT_TMPDATA+4)
 
+#define ROPKIT_CUR_TEXT_VMEMPTR (ROPKIT_TMPDATA+0x2C)
+#define ROPKIT_CUR_TEXT_LINEARPAGEPTR (ROPKIT_TMPDATA+0x30)
+#define ROPKIT_CUR_TEXT_LINEARPAGEPTR_TMP (ROPKIT_TMPDATA+0x34)
+#define ROPKIT_LINEARPAGEARRAY_CURPTR (ROPKIT_TMPDATA+0x38)
+#define ROPKIT_LINEARPAGEARRAY (ROPKIT_TMPDATA+0x3C)
+
+#define ROPKIT_ROPBAK (ROPKIT_TMPDATA+0x100)
+
+#ifndef ROPKIT_BINLOAD_SIZE
+	#define ROPKIT_BINLOAD_SIZE 0xC000
+#endif
+
+#define ROPKIT_LINEARMEM_WORKBUF (ROPKIT_LINEARMEM_BUF+ROPKIT_BINLOAD_SIZE)
+
 #ifndef ROPKIT_BINLOAD_ADDR
 	#define ROPKIT_BINLOAD_ADDR ROPKIT_LINEARMEM_BUF
 #endif
 
-#ifndef ROPKIT_BINLOAD_SIZE
-	#define ROPKIT_BINLOAD_SIZE 0xC000
+#ifndef ROPKIT_BINLOAD_TEXTOFFSET
+	#define ROPKIT_BINLOAD_TEXTOFFSET 0x1000
 #endif
 
 #ifndef ROPKIT_BINPAYLOAD_PATH
@@ -23,6 +37,8 @@
 #ifndef ROPKIT_OTHERAPP_NEWSP_ADDR
 	#define ROPKIT_OTHERAPP_NEWSP_ADDR (0x10000000-4)
 #endif
+
+#define ROPKIT_TRANSFER_CHUNKSIZE 0x100000
 
 #ifdef ROPKIT_MOUNTSD
 CALLFUNC_NOSP FS_MountSdmc, (ROPBUF + (ropkit_sd_archivename - _start)), 0, 0, 0
@@ -65,27 +81,114 @@ ROP_LOADR0_FROMADDR (ROPKIT_TMPDATA+0x24)
 @ *(ROPKIT_TMPDATA+0x28) = *r0. Hence, *(ROPKIT_TMPDATA+0x28) = word value from the table.
 ROPMACRO_COPYWORD_FROMR0 (ROPKIT_TMPDATA+0x28)
 
-@ Calculate the linearmem dst addr.
-ROPMACRO_LDDRR0_ADDR1_STRADDR (ROPKIT_TMPDATA+0x28), (ROPKIT_TMPDATA+0x28), ((ROPKIT_LINEARMEM_REGIONBASE - ROPKIT_APPMEMEND_TEXT_OFFSET) + 0x1000)
+@ Calculate the linearmem addr.
+ROPMACRO_LDDRR0_ADDR1_STRADDR (ROPKIT_TMPDATA+0x28), (ROPKIT_TMPDATA+0x28), (ROPKIT_LINEARMEM_REGIONBASE)
+
+@ *ROPKIT_LINEARPAGEARRAY_CURPTR = ROPKIT_LINEARPAGEARRAY
+ROPMACRO_WRITEWORD ROPKIT_LINEARPAGEARRAY_CURPTR, ROPKIT_LINEARPAGEARRAY
+
+@ Set *ROPKIT_CUR_TEXT_VMEMPTR to (0x00100000 + ROPKIT_BINLOAD_TEXTOFFSET).
+ROPMACRO_WRITEWORD ROPKIT_CUR_TEXT_VMEMPTR, (0x00100000 + ROPKIT_BINLOAD_TEXTOFFSET)
+
+@ Backup the ROP-chain data.
+CALLFUNC_NOSP MEMCPY, ROPKIT_ROPBAK, (ROPBUF + ((ropkit_searchloop_lpstart) - _start)), ((ropkit_searchloop_lpnext - ropkit_searchloop_lpstart) + CALLFUNC_NOSP_FUNCADROFFSET), 0
+
+ropkit_searchloop_lpstart:
+@ Check whether the start of the linearmem region was reached, jump to ropkit_searchloop_lpstart_aftercmp otherwise.
+ROPMACRO_CMPDATA (ROPKIT_TMPDATA+0x28), ROPKIT_LINEARMEM_REGIONBASE, (ROPBUF + (ropkit_searchloop_lpstart_aftercmp - _start))
+
+@ Trigger a crash since the target .text pages were not found.
+.word 0xa0b0c0d0
+
+ropkit_searchloop_lpstart_aftercmp:
+@ Subtract the current linearmem ptr by ROPKIT_TRANSFER_CHUNKSIZE.
+ROPMACRO_LDDRR0_ADDR1_STRADDR (ROPKIT_TMPDATA+0x28), (ROPKIT_TMPDATA+0x28), (-ROPKIT_TRANSFER_CHUNKSIZE)
+
+@ Copy the current chunk to ROPKIT_LINEARMEM_WORKBUF.
+CALLFUNC_NOSP GSPGPU_FlushDataCache, ROPKIT_LINEARMEM_WORKBUF, ROPKIT_TRANSFER_CHUNKSIZE, 0, 0
+
+CALL_GXCMD4_LDRSRC (ROPKIT_TMPDATA+0x28), ROPKIT_LINEARMEM_WORKBUF, ROPKIT_TRANSFER_CHUNKSIZE
+
+@ Wait 0.1s for the transfer to finish.
+CALLFUNC_R0R1 svcSleepThread, 100000000, 0
+
+@ Set *ROPKIT_CUR_TEXT_LINEARPAGEPTR to ROPKIT_LINEARMEM_WORKBUF.
+ROPMACRO_WRITEWORD ROPKIT_CUR_TEXT_LINEARPAGEPTR, ROPKIT_LINEARMEM_WORKBUF
+
+ropkit_searchloop_cmptextword_start:
+@ r0 = *ROPKIT_CUR_TEXT_VMEMPTR
+ROP_LOADR0_FROMADDR ROPKIT_CUR_TEXT_VMEMPTR
+
+@ Write *r0 to the cmpword used in the below macro.
+ROPMACRO_COPYWORD_FROMR0 (ROPBUF + (ropkit_searchloop_cmptextword_macrostart - _start) + ROPMACRO_CMPDATA_CMPWORD_OFFSET)
+
+@ Write *ROPKIT_CUR_TEXT_LINEARPAGEPTR to the cmpaddr used in the below macro.
+ROPMACRO_COPYWORD (ROPBUF + (ropkit_searchloop_cmptextword_macrostart - _start) + ROPMACRO_CMPDATA_CMPADDR_OFFSET), (ROPKIT_CUR_TEXT_LINEARPAGEPTR)
+
+@ Compare the first word in the current linearmem page with the .text page word, on fail jump to ropkit_searchloop_cmptextword_lpnext.
+ropkit_searchloop_cmptextword_macrostart:
+ROPMACRO_CMPDATA 0, 0, (ROPBUF + (ropkit_searchloop_cmptextword_lpnext - _start))
+
+ROPMACRO_LDDRR0_ADDR1_STRADDR ROPKIT_CUR_TEXT_VMEMPTR, ROPKIT_CUR_TEXT_VMEMPTR, 0x1000
+
+@ *ROPKIT_CUR_TEXT_LINEARPAGEPTR_TMP = *ROPKIT_CUR_TEXT_LINEARPAGEPTR - <buffer_baseaddr>
+ROPMACRO_LDDRR0_ADDR1_STRADDR ROPKIT_CUR_TEXT_LINEARPAGEPTR_TMP, ROPKIT_CUR_TEXT_LINEARPAGEPTR, -ROPKIT_LINEARMEM_WORKBUF
+
+@ Copy the actual .text linearmem addr to the value word used in the below add-macro.
+ROPMACRO_COPYWORD (ROPBUF + (ropkit_searchloop_cmptextword_matchfound_addrcalc_addstart1 - _start) + ROPMACRO_LDDRR0_ADDR1_STRADDR_VALUEOFFSET), (ROPKIT_TMPDATA+0x28)
+
+ropkit_searchloop_cmptextword_matchfound_addrcalc_addstart1:
+ROPMACRO_LDDRR0_ADDR1_STRADDR ROPKIT_CUR_TEXT_LINEARPAGEPTR_TMP, ROPKIT_CUR_TEXT_LINEARPAGEPTR_TMP, 0
+
+@ Overwrite the dstaddr in the below macro with the array-entry address from ROPKIT_LINEARPAGEARRAY_CURPTR.
+ROPMACRO_COPYWORD (ROPBUF + (ropkit_searchloop_cmptextword_writearrayentry_macrostart - _start) + ROPMACRO_COPYWORD_DSTADDROFFSET), ROPKIT_LINEARPAGEARRAY_CURPTR
+
+@ Write the linearmem page address to the current array-entry.
+ropkit_searchloop_cmptextword_writearrayentry_macrostart:
+ROPMACRO_COPYWORD 0, ROPKIT_CUR_TEXT_LINEARPAGEPTR_TMP
+
+@ Update the address stored at ROPKIT_LINEARPAGEARRAY_CURPTR.
+ROPMACRO_LDDRR0_ADDR1_STRADDR ROPKIT_LINEARPAGEARRAY_CURPTR, ROPKIT_LINEARPAGEARRAY_CURPTR, 0x4
+
+@ Check whether the end of the vmem .text payload area was reached. If so jump to ropkit_searchloop_finished, otherwise jump to ropkit_searchloop_cmptextword_lpnext.
+ROPMACRO_CMPDATA ROPKIT_CUR_TEXT_VMEMPTR, (0x00100000 + ROPKIT_BINLOAD_TEXTOFFSET + ROPKIT_BINLOAD_SIZE), (ROPBUF + (ropkit_searchloop_cmptextword_lpnext - _start))
+ROPMACRO_STACKPIVOT (ROPBUF + (ropkit_searchloop_finished - _start)), ROP_POPPC
+
+ropkit_searchloop_cmptextword_lpnext:
+@ Update the address at ROPKIT_CUR_TEXT_LINEARPAGEPTR, and then jump to ropkit_searchloop_cmptextword_start if the end of the linearmem buffer wasn't reached yet.
+ROPMACRO_LDDRR0_ADDR1_STRADDR ROPKIT_CUR_TEXT_LINEARPAGEPTR, ROPKIT_CUR_TEXT_LINEARPAGEPTR, 0x1000
+ROPMACRO_CMPDATA ROPKIT_CUR_TEXT_LINEARPAGEPTR, (ROPKIT_LINEARMEM_WORKBUF + ROPKIT_TRANSFER_CHUNKSIZE), (ROPBUF + (ropkit_searchloop_cmptextword_start - _start))
+
+ropkit_searchloop_lpnext:
+@ Restore the ROP-chain data.
+CALLFUNC_NOSP MEMCPY, (ROPBUF + ((ropkit_searchloop_lpstart) - _start)), ROPKIT_ROPBAK, ((ropkit_searchloop_lpnext - ropkit_searchloop_lpstart) + CALLFUNC_NOSP_FUNCADROFFSET), 0
+ROPMACRO_WRITEWORD (ROPBUF + ((ropkit_searchloop_lpnext - _start) + CALLFUNC_NOSP_FUNCADROFFSET)), MEMCPY @ Restore the funcaddr used above(this can't be done from the memcpy since that would overwrite the saved LR).
+ROPMACRO_STACKPIVOT (ROPBUF + (ropkit_searchloop_lpstart - _start)), ROP_POPPC
+
+ropkit_searchloop_finished:
 
 @ Write the codebin into .text.
 
-CALL_GXCMD4_LDRDST ROPKIT_LINEARMEM_BUF, (ROPKIT_TMPDATA+0x28), ROPKIT_BINLOAD_SIZE
+@ TODO: Actually use the linearmem page array here.
+
+.word 0x50102040
+
+CALL_GXCMD4_LDRDST ROPKIT_BINLOAD_ADDR, (ROPKIT_TMPDATA+0x28), ROPKIT_BINLOAD_SIZE
 
 @ Wait 0.1s for the transfer to finish.
 CALLFUNC_R0R1 svcSleepThread, 100000000, 0
 
 @ Setup the paramblk.
 
-CALLFUNC_NOSP MEMSET32_OTHER, ROPKIT_LINEARMEM_BUF, 0x1000, 0, 0
+CALLFUNC_NOSP MEMSET32_OTHER, ROPKIT_LINEARMEM_WORKBUF, 0x1000, 0, 0
 
-ROPMACRO_WRITEWORD (ROPKIT_LINEARMEM_BUF + 0x1c), GXLOW_CMD4
-ROPMACRO_WRITEWORD (ROPKIT_LINEARMEM_BUF + 0x20), GSPGPU_FlushDataCache
-ROPMACRO_WRITEWORD (ROPKIT_LINEARMEM_BUF + 0x48), 0x8d @ Flags
-ROPMACRO_WRITEWORD (ROPKIT_LINEARMEM_BUF + 0x58), GSPGPU_SERVHANDLEADR
+ROPMACRO_WRITEWORD (ROPKIT_LINEARMEM_WORKBUF + 0x1c), GXLOW_CMD4
+ROPMACRO_WRITEWORD (ROPKIT_LINEARMEM_WORKBUF + 0x20), GSPGPU_FlushDataCache
+ROPMACRO_WRITEWORD (ROPKIT_LINEARMEM_WORKBUF + 0x48), 0x8d @ Flags
+ROPMACRO_WRITEWORD (ROPKIT_LINEARMEM_WORKBUF + 0x58), GSPGPU_SERVHANDLEADR
 
 @ Jump to the payload.
-CALLFUNC_R0R1 0x00101000, ROPKIT_LINEARMEM_BUF, ROPKIT_OTHERAPP_NEWSP_ADDR
+CALLFUNC_R0R1 (0x00100000 + ROPKIT_BINLOAD_TEXTOFFSET), ROPKIT_LINEARMEM_WORKBUF, ROPKIT_OTHERAPP_NEWSP_ADDR
 
 .word 0x40506070
 

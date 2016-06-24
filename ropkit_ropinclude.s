@@ -135,6 +135,8 @@ ROP_SETR1 0 @ Overwritten by the above rop.
 .word 0 @ r6
 .endm
 
+@ Size: 0x40
+#define CALLFUNC_NOSP_FUNCADROFFSET 0x3C
 .macro CALLFUNC_NOSP funcadr, r0, r1, r2, r3
 ROP_SETLR ROP_POPPC
 
@@ -241,6 +243,8 @@ ROPMACRO_STACKPIVOT_JUMP
 .word 0 @ r5
 .endm
 
+#define ROPMACRO_CMPDATA_CMPADDR_OFFSET 0x2C
+#define ROPMACRO_CMPDATA_CMPWORD_OFFSET 0x38
 .macro ROPMACRO_CMPDATA cmpaddr, cmpword, stackaddr_cmpmismatch
 ROP_SETLR ROP_POPPC
 
@@ -277,6 +281,7 @@ ROP_SETR1 \value
 .endm
 
 @ Size: 0x14 + 0x20 + 0x8 + 0x4 (0x40)
+#define ROPMACRO_COPYWORD_DSTADDROFFSET 0x38
 .macro ROPMACRO_COPYWORD dstaddr, srcaddr
 ROP_SETLR ROP_POPPC
 

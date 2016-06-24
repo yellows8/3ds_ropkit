@@ -6,3 +6,8 @@ Currently this is only usable with GCC with the "-x assembler-with-cpp" build op
 
 This requires [ropgadget_patternfinder](https://github.com/yellows8/ropgadget_patternfinder).
 
+# ropkit_boototherapp.s
+This handles booting the otherapp \*hax payload, various defines are required.
+
+This automatically handles locating each 0x1000-byte page in .text used with the payload in physmem, across the entire APPLICATION memregion. Hence, this bypasses the codebin physmem randomization added with v10.4, which was later enabled for more titles with v11.0.
+

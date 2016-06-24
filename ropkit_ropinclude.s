@@ -135,6 +135,35 @@ ROP_SETR1 0 @ Overwritten by the above rop.
 .word 0 @ r6
 .endm
 
+@ This is basically: CALLFUNC funcadr, *r0, *r1, r2, r3, sp0, sp4, sp8, sp12
+#define CALLFUNC_LDRR0R1_R1OFFSET 0x14 + ROPMACRO_COPYWORD_SRCADDROFFSET
+.macro CALLFUNC_LDRR0R1 funcadr, r0, r1, r2, r3, sp0, sp4, sp8, sp12
+ROP_SETLR ROP_POPPC
+
+ROPMACRO_COPYWORD (ROPBUF + ((. + 0x8 + 0x14 + 0x20 + 0x4) - _start)), \r1
+
+ROP_LOADR0_FROMADDR \r0
+
+ROP_SETLR POP_R2R6PC
+
+ROP_SETR1 0 @ Overwritten by the above rop.
+
+.word POP_R2R6PC
+.word \r2
+.word \r3
+.word 0 @ r4
+.word 0 @ r5
+.word 0 @ r6
+
+.word \funcadr
+
+.word \sp0
+.word \sp4
+.word \sp8
+.word \sp12
+.word 0 @ r6
+.endm
+
 @ Size: 0x40
 #define CALLFUNC_NOSP_FUNCADROFFSET 0x3C
 .macro CALLFUNC_NOSP funcadr, r0, r1, r2, r3
@@ -219,6 +248,11 @@ CALLFUNC_LOADR0 GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
 CALLFUNC_LDRR1 GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
 .endm
 
+@ This is basically: CALL_GXCMD4 *srcadr, *dstadr, cpysize
+.macro CALL_GXCMD4_LDRSRCDST srcadr, dstadr, cpysize
+CALLFUNC_LDRR0R1 GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
+.endm
+
 .macro ROPMACRO_STACKPIVOT_PREPARE sp, pc
 @ Write to the word which will be popped into sp.
 ROPMACRO_WRITEWORD (ROPBUF + (stackpivot_sploadword - _start)), \sp
@@ -281,6 +315,7 @@ ROP_SETR1 \value
 .endm
 
 @ Size: 0x14 + 0x20 + 0x8 + 0x4 (0x40)
+#define ROPMACRO_COPYWORD_SRCADDROFFSET 0x2c
 #define ROPMACRO_COPYWORD_DSTADDROFFSET 0x38
 .macro ROPMACRO_COPYWORD dstaddr, srcaddr
 ROP_SETLR ROP_POPPC

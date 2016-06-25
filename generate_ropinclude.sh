@@ -121,6 +121,14 @@ if [[ $? -eq 0 ]]; then
 	echo "$printstr"
 fi
 
+# Locate svcGetProcessId.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=429c407642c36bdf169d167bf3efc7a0eb4cf5052a08a97fc56ecbcfdb96f1b8 --patternsha256size=0x18 "--plainout=#define svcGetProcessId "`
+
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+fi
+
 # Locate the ipc command function for throwfatalerror.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=184f0cd7d0fe37a8990cf02e8500bb4267a7e23ae14c8d2b76a5f6ae756c7345 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x38 "--plainout=#define THROWFATALERR_IPC "`

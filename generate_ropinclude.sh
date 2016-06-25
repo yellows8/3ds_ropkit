@@ -47,6 +47,14 @@ if [[ $? -eq 0 ]]; then
 	echo "$printstr"
 fi
 
+# Locate POP_R5R6PC here since it's not always available.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=6ba53f3ece56d84fae11a675a32bf9a6cb4f2036f01a6da0932ade8a5878e001 --patternsha256size=0x4 "--plainout=#define POP_R5R6PC "`
+
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+fi
+
 # Locate the gadget for ROP_CMPR0R1.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=947b973f3ad1e3073fa0aaf9e05314cb7f95cb0bbdde1d0f2b65e75c854be08e --patterndatamask=ffffffff00ffffff00ffffffffffffff --patternsha256size=0x10 "--plainout=#define ROP_CMPR0R1 "`

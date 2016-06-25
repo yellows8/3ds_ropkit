@@ -8,7 +8,7 @@ then
 	fi
 fi
 
-ropgadget_patternfinder $1 --script=$2/ropkit_ropgadget_script --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --disablelocatehalt
+ropgadget_patternfinder $1 --script=$2/ropkit_ropgadget_script --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256
 if [[ $? -ne 0 ]]; then
 	exit $?
 fi

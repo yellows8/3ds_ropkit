@@ -3,6 +3,15 @@ if [[ $? -ne 0 ]]; then
 	exit $?
 fi
 
+# Locate ROP_POPR3_ADDSPR3_POPPC(not always available).
+# This pops r3 from stack, adds sp with r3, then pops pc from stack.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=47a687d3e467da0eb5fdd711ed9c94b043152bab2fbbbecc29ec2d6308da0494 --patternsha256size=0xc "--plainout=#define ROP_POPR3_ADDSPR3_POPPC "`
+
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+fi
+
 # Locate the gadget for setting r0.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=e0160ca8a7f0ec85bd4b01d8756fb82e38344124545f0a7d58ae2ac288da17cc --patternsha256size=0x4 "--plainout=#define POP_R0PC "`

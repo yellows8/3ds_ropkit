@@ -5,6 +5,10 @@
 
 #define ROP_EQBXLR_NE_CALLVTABLEFUNCPTR (IFile_Close+0x4) //Offset 0x4 in IFile_Close for ROP conditional execution. For condition-code EQ, bx-lr is executed, otherwise a vtable funcptr call with the r0 object is executed.
 
+#ifdef THROWFATALERR_IPC
+#define ROP_SENDCMDADDR THROWFATALERR_IPC+0x14 //Writes r0 to r4+0, then copies 0x80-bytes from r1 to r4+4. Then uses svcSendSyncRequest with handle *r5.
+#endif
+
 @ Size: 0x8
 .macro ROP_SETR0 value
 #ifdef POP_R0PC

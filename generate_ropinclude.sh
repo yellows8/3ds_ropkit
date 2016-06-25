@@ -123,7 +123,7 @@ fi
 
 # Locate the ipc command function for throwfatalerror.
 
-printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=370ebf6a62f70707f7fae1dfe7e343c16d95760a7333ab0e64266608b5484143 --patternsha256size=0x38 "--plainout=#define THROWFATALERR_IPC "`
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=184f0cd7d0fe37a8990cf02e8500bb4267a7e23ae14c8d2b76a5f6ae756c7345 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x38 "--plainout=#define THROWFATALERR_IPC "`
 
 if [[ $? -eq 0 ]]; then
 	echo "$printstr"
@@ -131,7 +131,7 @@ fi
 
 # Locate SRV_GETSERVICEHANDLE.
 
-printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=883dc75d232f768ecafc1d6fd569c3b8301b1eda5ef5d52392872eed9be7f015  --patterndatamask=ffffffff00ffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x18 "--plainout=#define SRV_GETSERVICEHANDLE "`
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=883dc75d232f768ecafc1d6fd569c3b8301b1eda5ef5d52392872eed9be7f015 --patterndatamask=ffffffff00ffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x18 "--plainout=#define SRV_GETSERVICEHANDLE "`
 if [[ $? -eq 0 ]]; then
 	echo "$printstr"
 else

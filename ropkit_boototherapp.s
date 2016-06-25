@@ -44,9 +44,13 @@
 CALLFUNC_NOSP FS_MountSdmc, (ROPBUF + (ropkit_sd_archivename - _start)), 0, 0, 0
 #endif
 
+#ifdef ROPKIT_MOUNTSAVEDATA
+CALLFUNC_NOSP FS_MountSavedata, (ROPBUF + (ropkit_savedata_archivename - _start)), 0, 0, 0
+#endif
+
 @ Load the file into the buffer.
 
-CALLFUNC_NOSP IFile_Open, ropkit_IFile_ctx, (ROPBUF + (ropkit_sdfile_path - _start)), 1, 0
+CALLFUNC_NOSP IFile_Open, ropkit_IFile_ctx, (ROPBUF + (ropkit_payload_path - _start)), 1, 0
 
 CALLFUNC_NOSP IFile_Read, ropkit_IFile_ctx, ROPKIT_TMPDATA, ROPKIT_BINLOAD_ADDR, ROPKIT_BINLOAD_SIZE
 COND_THROWFATALERR
@@ -222,7 +226,13 @@ ropkit_sd_archivename:
 .align 2
 #endif
 
-ropkit_sdfile_path:
+#ifdef ROPKIT_MOUNTSAVEDATA
+ropkit_savedata_archivename:
+.string "data:"
+.align 2
+#endif
+
+ropkit_payload_path:
 .string16 ROPKIT_BINPAYLOAD_PATH
 .align 2
 

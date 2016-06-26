@@ -9,6 +9,10 @@
 #define ROP_SENDCMDADDR THROWFATALERR_IPC+0x14 //Writes r0 to r4+0, then copies 0x80-bytes from r1 to r4+4. Then uses svcSendSyncRequest with handle *r5.
 #endif
 
+#ifndef ROPBUFLOC
+#define ROPBUFLOC(x) (ROPBUF + (x - _start))
+#endif
+
 @ Size: 0x8
 .macro ROP_SETR0 value
 #ifdef POP_R0PC
@@ -115,7 +119,7 @@ ROP_SETR1 \r1
 .macro CALLFUNC_LDRR1 funcadr, r0, r1, r2, r3, sp0, sp4, sp8, sp12
 ROP_SETLR ROP_POPPC
 
-ROPMACRO_COPYWORD (ROPBUF + ((. + 0x8 + 0x14 + 0x8 + 0x4) - _start)), \r1
+ROPMACRO_COPYWORD ROPBUFLOC(. + 0x8 + 0x14 + 0x8 + 0x4), \r1
 
 ROP_SETLR POP_R2R6PC
 
@@ -144,7 +148,7 @@ ROP_SETR1 0 @ Overwritten by the above rop.
 .macro CALLFUNC_LDRR0R1 funcadr, r0, r1, r2, r3, sp0, sp4, sp8, sp12
 ROP_SETLR ROP_POPPC
 
-ROPMACRO_COPYWORD (ROPBUF + ((. + 0x8 + 0x14 + 0x20 + 0x4) - _start)), \r1
+ROPMACRO_COPYWORD ROPBUFLOC(. + 0x8 + 0x14 + 0x20 + 0x4), \r1
 
 ROP_LOADR0_FROMADDR \r0
 
@@ -207,7 +211,7 @@ ROP_SETR1 \r1
 .macro CALLFUNC_NOSP_LOADR2 funcadr, r0, r1, r2, r3
 ROP_SETLR ROP_POPPC
 
-ROPMACRO_COPYWORD (ROPBUF + ((. + 0x8 + 0x8 + 0x8 + 0x4) - _start)), \r2
+ROPMACRO_COPYWORD ROPBUFLOC(. + 0x8 + 0x8 + 0x8 + 0x4), \r2
 
 ROP_SETR0 \r0
 
@@ -260,10 +264,10 @@ CALLFUNC_LDRR0R1 GXLOW_CMD4, \srcadr, \dstadr, \cpysize, 0, 0, 0, 0, 0x8
 #ifndef ROP_POPR3_ADDSPR3_POPPC
 .macro ROPMACRO_STACKPIVOT_PREPARE sp, pc
 @ Write to the word which will be popped into sp.
-ROPMACRO_WRITEWORD (ROPBUF + (stackpivot_sploadword - _start)), \sp
+ROPMACRO_WRITEWORD ROPBUFLOC(stackpivot_sploadword), \sp
 
 @ Write to the word which will be popped into pc.
-ROPMACRO_WRITEWORD (ROPBUF + (stackpivot_pcloadword - _start)), \pc
+ROPMACRO_WRITEWORD ROPBUFLOC(stackpivot_pcloadword), \pc
 .endm
 #endif
 
@@ -282,7 +286,7 @@ ROPMACRO_WRITEWORD (ROPBUF + (stackpivot_pcloadword - _start)), \pc
 	ROPMACRO_STACKPIVOT_JUMP
 #else
 	.word ROP_POPR3_ADDSPR3_POPPC
-	.word \sp - (ROPBUF + ((. + 0x4) - _start))
+	.word \sp - ROPBUFLOC(. + 0x4)
 #endif
 .endm
 
@@ -326,7 +330,7 @@ ROPMACRO_STACKPIVOT_PREPARE \stackaddr_cmpmismatch, ROP_POPPC
 ROPMACRO_STACKPIVOT_PREPAREREGS_BEFOREJUMP
 #endif
 
-ROP_SETR0 (ROPBUF + ((ropkit_cmpobject) - _start))
+ROP_SETR0 ROPBUFLOC(ropkit_cmpobject)
 
 #ifdef ROP_POPR3_ADDSPR3_POPPC
 ROP_SETLR POP_R1PC
@@ -335,7 +339,7 @@ ROP_SETLR POP_R1PC
 .word ROP_EQBXLR_NE_CALLVTABLEFUNCPTR @ When the value at cmpaddr matches cmpword, continue the ROP, otherwise call the vtable funcptr which then does the stack-pivot.
 
 #ifdef ROP_POPR3_ADDSPR3_POPPC
-.word (\stackaddr_cmpmismatch) - (ROPBUF + ((. + 0x4) - _start))
+.word (\stackaddr_cmpmismatch) - ROPBUFLOC(. + 0x4)
 #endif
 .endm
 

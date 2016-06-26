@@ -9,6 +9,10 @@
 #define ROP_SENDCMDADDR THROWFATALERR_IPC+0x14 //Writes r0 to r4+0, then copies 0x80-bytes from r1 to r4+4. Then uses svcSendSyncRequest with handle *r5.
 #endif
 
+#ifdef ROP_POPR3_ADDSPR3_POPPC
+#define STACKPIVOT_ADR ROP_POPR3_ADDSPR3_POPPC
+#endif
+
 #ifndef ROPBUFLOC
 #define ROPBUFLOC(x) (ROPBUF + (x - _start))
 #endif

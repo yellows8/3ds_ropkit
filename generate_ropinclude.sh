@@ -113,6 +113,16 @@ else
 	fi
 fi
 
+# Locate svcCreateThread.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=0103df5f7916ca91a0c1698573ae7878a488c5df5f01e717f336dca82262b6a9 --patternsha256size=0x24 "--plainout=#define svcCreateThread "`
+
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	echo "//WARNING: svcCreateThread not found."
+fi
+
 # Locate svcConnectToPort.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=64a052c8f577f2b6810b6bc488bb14e745f1066195dc14f498aea8e82245b0c4 --patternsha256size=0x18 "--plainout=#define svcConnectToPort "`

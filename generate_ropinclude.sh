@@ -253,6 +253,22 @@ fi
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=ff6e2e8495967faa7c7a25c6f5ab5a6ab571b3557bd1cf2fed6bcf344a3da892 --patterndatamask=ffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x4c "--plainout=#define FS_MountSavedata "`
 if [[ $? -eq 0 ]]; then
 	echo "$printstr"
+else
+	# Newer version of the above.
+
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=92ba31c704c29ef4549b18dad28138b449f3e55f035640bd306dc01e7cac0ad2 --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x6c "--plainout=#define FS_MountSavedata "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		# Newer version of the above.
+
+		printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=e7d553ccf1cac7d3efe4d7fc441564368f346271d320746b507331545075776c --patterndatamask=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff --patternsha256size=0x74 "--plainout=#define FS_MountSavedata "`
+
+		if [[ $? -eq 0 ]]; then
+			echo "$printstr"
+		fi
+	fi
 fi
 
 # Locate IFile_Open.

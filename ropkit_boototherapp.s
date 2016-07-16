@@ -52,6 +52,11 @@ CALLFUNC_NOSP FS_MountSavedata, ROPBUFLOC(ropkit_savedata_archivename), 0, 0, 0
 
 CALLFUNC_NOSP IFile_Open, ropkit_IFile_ctx, ROPBUFLOC(ropkit_payload_path), 1, 0
 
+#ifdef ROPKIT_BINPAYLOAD_FILEOFFSET //Optional. Reuse IFile_Read for file-"seeking", so that a IFile_Seek pattern doesn't need added. Hence, ROPKIT_BINPAYLOAD_FILEOFFSET should be a "size" that fits under the buffer at ROPKIT_BINLOAD_ADDR.
+CALLFUNC_NOSP IFile_Read, ropkit_IFile_ctx, ROPKIT_TMPDATA, ROPKIT_BINLOAD_ADDR, ROPKIT_BINPAYLOAD_FILEOFFSET
+COND_THROWFATALERR
+#endif
+
 CALLFUNC_NOSP IFile_Read, ropkit_IFile_ctx, ROPKIT_TMPDATA, ROPKIT_BINLOAD_ADDR, ROPKIT_BINLOAD_SIZE
 COND_THROWFATALERR
 

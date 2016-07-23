@@ -394,6 +394,18 @@ ROP_SETR1 \dstaddr
 .word ROP_STR_R0TOR1 @ Write the above r0 value to *dstaddr.
 .endm
 
+.macro ROPMACRO_LDDRR0_ADDR1_STRVALUE addr, addval, writeval
+ROP_LOADR0_FROMADDR \addr
+
+ROP_SETR1 \addval
+
+.word ROP_ADDR0_TO_R1 @ r0 = *addr + addval
+
+ROP_SETR1 \writeval
+
+.word ROP_STR_R1TOR0 @ Write the above writeval to <calculated r0>.
+.endm
+
 .macro ROPMACRO_IFile_Close IFile_ctx
 ROP_LOADR0_FROMADDR \IFile_ctx
 

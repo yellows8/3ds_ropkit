@@ -236,6 +236,8 @@ ROP_SETLR ROP_POPPC
 .word \funcadr
 .endm
 
+#define CALLFUNC_R0R1_R0OFFSET 0x14 + 0x4
+#define CALLFUNC_R0R1_R1OFFSET 0x14 + 0x8 + 0x4
 .macro CALLFUNC_R0R1 funcadr, r0, r1
 ROP_SETLR ROP_POPPC
 

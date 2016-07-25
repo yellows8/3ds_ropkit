@@ -305,3 +305,12 @@ else
 	fi
 fi
 
+# Locate IFile_Seek.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=b3b7b5e5043302d1aa6f40af86fd0299a462cc8264fe1db58ac29218bae0984c --patternsha256size=0x40 "--plainout=#define IFile_Seek "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	echo "//WARNING: IFile_Seek not found."
+fi
+

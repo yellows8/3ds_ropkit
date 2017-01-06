@@ -14,7 +14,6 @@
 --patterndata=b07e2e2704ce8c323d159ab2283960209789fd5aa19952e762d59f4c2a38dad3 --patternsha256size=0x8 "--plainout=#define ROP_ADDR0_TO_R1 "
 
 --patterndata=19225e46a4449071f62d46304c171b3d2c99d8a63be06144e8c07655977eb7f5 --patterndatamask=ffffffff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffffffffff000000ff --patternsha256size=0x44 "--plainout=#define MEMCPY "
---patterndata=730f1de429d80d0f5e921d483b8078909870c94538bd3b400f1823010ab4c53e --patternsha256size=0x28 "--plainout=#define MEMSET32_OTHER "
 
 --patterndata=830c604f4c125a2e0bf80a8716809e21a75b0cd93e7a2c3a4bf4b096117f195c --patternsha256size=0x10 "--plainout=#define svcControlMemory "
 --patterndata=a424f8b938aa4919842c18cf173c854c6412bacc5bf48ff0abbb7164e69ec507 --patternsha256size=0x8 "--plainout=#define svcSleepThread "

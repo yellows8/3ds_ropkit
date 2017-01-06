@@ -88,6 +88,21 @@ else
 	fi
 fi
 
+# Locate MEMSET32_OTHER.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=730f1de429d80d0f5e921d483b8078909870c94538bd3b400f1823010ab4c53e --patternsha256size=0x28 "--plainout=#define MEMSET32_OTHER "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=e1a8a23776be0edde9d846f79f3a63c8652b629ae7a105aef8eb3e70c490ba7f --patternsha256size=0x28 "--plainout=#define MEMSET32_OTHER "`
+
+	if [[ $? -eq 0 ]]; then
+		echo "$printstr"
+	else
+		echo "//WARNING: MEMSET32_OTHER not found."
+	fi
+fi
+
 # Locate ROP_INITOBJARRAY.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=ea2d9f91d1fdb4bc29803e1f24dafd5b2f3aa3455579e356448933f149132243 --patternsha256size=0x18 "--plainout=#define ROP_INITOBJARRAY " --addval=0x1`

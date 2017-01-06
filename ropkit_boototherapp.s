@@ -40,6 +40,11 @@
 
 #define ROPKIT_TRANSFER_CHUNKSIZE 0x100000
 
+#ifdef ROPKIT_GSPTHREAD_OBJECTADDR
+@ Set the flag for terminating the GSP thread.
+ROPMACRO_WRITEWORD ROPKIT_GSPTHREAD_OBJECTADDR+0x77, 0x1
+#endif
+
 #ifdef ROPKIT_MOUNTSD
 CALLFUNC_NOSP FS_MountSdmc, ROPBUFLOC(ropkit_sd_archivename), 0, 0, 0
 #endif

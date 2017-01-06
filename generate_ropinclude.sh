@@ -103,6 +103,16 @@ else
 	fi
 fi
 
+# Locate svcControlMemory.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=830c604f4c125a2e0bf80a8716809e21a75b0cd93e7a2c3a4bf4b096117f195c --patternsha256size=0x10 "--plainout=#define svcControlMemory "`
+
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	echo "//WARNING: svcControlMemory not found."
+fi
+
 # Locate ROP_INITOBJARRAY.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=ea2d9f91d1fdb4bc29803e1f24dafd5b2f3aa3455579e356448933f149132243 --patternsha256size=0x18 "--plainout=#define ROP_INITOBJARRAY " --addval=0x1`

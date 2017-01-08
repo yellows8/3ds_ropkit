@@ -264,6 +264,15 @@ else
 	fi
 fi
 
+# Locate GSPTHREAD_OBJECTADDR.
+
+printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 --patterntype=sha256 --patterndata=ac35305d80ce0c7e3a312a2704c08e67d54c2b6020c918c06b2d6c86fef74334 --patternsha256size=0x5c --dataload=0x80 "--plainout=#define GSPTHREAD_OBJECTADDR "`
+if [[ $? -eq 0 ]]; then
+	echo "$printstr"
+else
+	echo "//WARNING: GSPTHREAD_OBJECTADDR not found."
+fi
+
 # Locate FS_MountSdmc.
 
 printstr=`ropgadget_patternfinder $1 --baseaddr=0x100000 $ROPKIT_PATTERNFINDER_BLACKLISTPARAM --patterntype=sha256 --patterndata=e25b7bfb96863f69fcbef8fdad176da9dff3e72502c1f2ca837115b3fc290212 --patternsha256size=0x10 "--plainout=#define FS_MountSdmc "`
